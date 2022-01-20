@@ -11,7 +11,7 @@ internal fun Project.registerCopyXCFrameworkFileTask() {
         description = "Copies XCFrameworks into swiftpackage output folder"
 
         val configuration = getConfigurationOrThrow()
-        dependsOn("assemble${configuration.xcFrameworkName.value}XCFramework")
+        dependsOn("assemble${configuration.xcFrameworkName.value}${configuration.buildConfiguration.name.capitalize()}XCFramework")
 
         val buildConfiguration = configuration.buildConfiguration.name
         from(
