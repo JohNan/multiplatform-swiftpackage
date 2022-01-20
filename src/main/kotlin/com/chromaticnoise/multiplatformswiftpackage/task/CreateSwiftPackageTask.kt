@@ -10,7 +10,6 @@ internal fun Project.registerCreateSwiftPackageTask() {
         group = "multiplatform-swift-package"
         description = "Creates a Swift package to distribute an XCFramework"
 
-        dependsOn("createXCFramework")
         dependsOn("createZipFile")
 
         doLast {

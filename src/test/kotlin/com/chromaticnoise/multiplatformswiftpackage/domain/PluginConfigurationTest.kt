@@ -50,6 +50,15 @@ class PluginConfigurationTest : BehaviorSpec() {
                 }
             }
 
+            When("the xcframework name produced errors") {
+                val expectedError = BlankXCFrameworkName
+                extension.xcframeworkName = Either.Left(expectedError)
+
+                Then("an error should be returned") {
+                    (PluginConfiguration.of(extension) as Either.Left).value.contains(expectedError)
+                }
+            }
+
             When("the package name produced errors") {
                 val expectedError = BlankPackageName
                 extension.packageName = Either.Left(expectedError)
@@ -73,6 +82,7 @@ class PluginConfigurationTest : BehaviorSpec() {
                 val framework = AppleFramework(AppleFrameworkOutputFile(mockk()), AppleFrameworkName(expectedName), AppleFrameworkLinkTask(""))
                 extension.swiftToolsVersion = SwiftToolVersion.of("42")
                 extension.packageName = null
+                extension.xcframeworkName = XCFrameworkName.of(expectedName)
                 extension.appleTargets = listOf(
                     mockk { every { getFramework(any()) } returns framework }
                 )

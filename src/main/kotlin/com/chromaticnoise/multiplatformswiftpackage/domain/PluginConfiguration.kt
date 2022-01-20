@@ -12,12 +12,14 @@ internal class PluginConfiguration private constructor(
     val distributionMode: DistributionMode,
     val targetPlatforms: Collection<TargetPlatform>,
     val appleTargets: Collection<AppleTarget>,
-    val zipFileName: ZipFileName
+    val zipFileName: ZipFileName,
+    val xcFrameworkName: XCFrameworkName
 ) {
     internal companion object {
         fun of(extension: SwiftPackageExtension): Either<List<PluginConfigurationError>, PluginConfiguration> {
             val targetPlatforms = extension.targetPlatforms.platforms
             val packageName = extension.getPackageName()
+            val xcFrameworkName = extension.getXCFrameworkName()
 
             val errors = mutableListOf<PluginConfigurationError>().apply {
                 if (extension.swiftToolsVersion == null) {
@@ -40,6 +42,8 @@ internal class PluginConfiguration private constructor(
                 packageName.leftValueOrNull?.let { error -> add(error) }
 
                 extension.zipFileName?.leftValueOrNull?.let { error -> add(error) }
+
+                extension.xcframeworkName?.leftValueOrNull?.let { error -> add(error) }
             }
 
             return if (errors.isEmpty()) {
@@ -52,7 +56,13 @@ internal class PluginConfiguration private constructor(
                         extension.distributionMode,
                         targetPlatforms,
                         extension.appleTargets,
-                        extension.zipFileName?.orNull ?: defaultZipFileName(packageName.orNull!!, extension.project)
+                        extension.zipFileName?.orNull ?: defaultZipFileName(
+                            packageName.orNull!!,
+                            extension.project
+                        ),
+                        extension.xcframeworkName?.orNull ?: defaultXCFrameworkName(
+                            xcFrameworkName.orNull!!
+                        )
                     )
                 )
             } else {
@@ -60,13 +70,22 @@ internal class PluginConfiguration private constructor(
             }
         }
 
-        private fun SwiftPackageExtension.getPackageName(): Either<PluginConfigurationError, PackageName> = packageName
-            ?: appleTargets.map { it.getFramework(buildConfiguration) }.firstOrNull()?.let { framework ->
-                PackageName.of(framework.name.value)
-            } ?: Either.Left(BlankPackageName)
+        private fun SwiftPackageExtension.getPackageName(): Either<PluginConfigurationError, PackageName> =
+            packageName
+                ?: appleTargets.map { it.getFramework(buildConfiguration) }.firstOrNull()
+                    ?.let { framework ->
+                        PackageName.of(framework.name.value)
+                    } ?: Either.Left(BlankPackageName)
+
+        private fun SwiftPackageExtension.getXCFrameworkName(): Either<PluginConfigurationError, XCFrameworkName> {
+            return xcframeworkName ?: Either.Left(BlankXCFrameworkName)
+        }
 
         private fun defaultZipFileName(packageName: PackageName, project: Project) =
             ZipFileName.of("${packageName.value}-${project.version}").orNull!!
+
+        private fun defaultXCFrameworkName(xcFrameworkName: XCFrameworkName) =
+            XCFrameworkName.of(xcFrameworkName.value).orNull!!
     }
 
     internal sealed class PluginConfigurationError {
@@ -76,5 +95,6 @@ internal class PluginConfiguration private constructor(
         object MissingAppleTargets : PluginConfigurationError()
         object BlankPackageName : PluginConfigurationError()
         object BlankZipFileName : PluginConfigurationError()
+        object BlankXCFrameworkName : PluginConfigurationError()
     }
 }

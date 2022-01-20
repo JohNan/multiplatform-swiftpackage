@@ -40,5 +40,8 @@ private fun List<PluginConfigurationError>.toErrorMessage() = joinToString("\n\n
         PluginConfigurationError.BlankZipFileName -> """
         * ZIP file name must not be blank
         """.trimIndent()
+        PluginConfigurationError.BlankXCFrameworkName -> """
+        * XCFramework name must not be blank
+        """.trimIndent()
     }
 }

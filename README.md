@@ -41,6 +41,7 @@ This is a complete example of the required configuration. All available options 
 
 ```kotlin
 multiplatformSwiftPackage {
+    xcFrameworkName("xcframework package name")
     swiftToolsVersion("5.3")
     targetPlatforms {
       iOS { v("13") }

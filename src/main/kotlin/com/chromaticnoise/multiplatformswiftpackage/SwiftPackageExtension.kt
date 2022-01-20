@@ -14,12 +14,15 @@ public open class SwiftPackageExtension(internal val project: Project) {
 
     internal var buildConfiguration: BuildConfiguration = BuildConfiguration.Release
     internal var packageName: Either<PluginConfigurationError, PackageName>? = null
-    internal var outputDirectory: OutputDirectory = OutputDirectory(File(project.projectDir, "swiftpackage"))
+    internal var outputDirectory: OutputDirectory =
+        OutputDirectory(File(project.projectDir, "swiftpackage"))
     internal var swiftToolsVersion: SwiftToolVersion? = null
     internal var distributionMode: DistributionMode = DistributionMode.Local
-    internal var targetPlatforms: Collection<Either<List<PluginConfigurationError>, TargetPlatform>> = emptyList()
+    internal var targetPlatforms: Collection<Either<List<PluginConfigurationError>, TargetPlatform>> =
+        emptyList()
     internal var appleTargets: Collection<AppleTarget> = emptyList()
     internal var zipFileName: Either<PluginConfigurationError, ZipFileName>? = null
+    internal var xcframeworkName: Either<PluginConfigurationError, XCFrameworkName>? = null
 
     /**
      * Sets the name of the Swift package.
@@ -29,6 +32,10 @@ public open class SwiftPackageExtension(internal val project: Project) {
      */
     public fun packageName(name: String) {
         packageName = PackageName.of(name)
+    }
+
+    public fun xcframeworkName(name: String) {
+        xcframeworkName = XCFrameworkName.of(name)
     }
 
     /**
